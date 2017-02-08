@@ -29,6 +29,7 @@ Adventures.bindErrorHandlers = function () {
 //The core function of the app, sends the user's choice and then parses the results to the server and handling the response
 Adventures.chooseOption = function(){
     Adventures.currentStep = $(this).val();
+
     $.ajax("/story",{
         type: "POST",
         data: {"user": Adventures.currentUser,
@@ -44,9 +45,11 @@ Adventures.chooseOption = function(){
     });
 };
 
+//Update the questions
 Adventures.write = function (message) {
     //Writing new choices and image to screen
     $(".situation-text").text(message["text"]).show();
+
     for(var i=0;i<message['options'].length;i++){
         var opt = $("#option_" + (i+1));
         opt.text(message['options'][i]['option_text']);
@@ -58,9 +61,17 @@ Adventures.write = function (message) {
 
 Adventures.start = function(){
     $(document).ready(function () {
+
+        // add event listener to buttons
         $(".game-option").click(Adventures.chooseOption);
+
+        // when name is entered update start game button state
         $("#nameField").keyup(Adventures.checkName);
+
+        // add event listener to start game
         $(".adventure-button").click(Adventures.initAdventure);
+
+        // Hide the adventure section, will be visible when the game starts and show welcome screen
         $(".adventure").hide();
         $(".welcome-screen").show();
     });
@@ -71,6 +82,7 @@ Adventures.setImage = function (img_name) {
     $("#situation-image").attr("src", "./images/" + img_name);
 };
 
+//Function to enable or disable start game button
 Adventures.checkName = function(){
     if($(this).val() !== undefined && $(this).val() !== null && $(this).val() !== ""){
         $(".adventure-button").prop("disabled", false);
@@ -81,6 +93,8 @@ Adventures.checkName = function(){
 };
 
 
+
+//get new adventure and initiate
 Adventures.initAdventure = function(){
 
     $.ajax("/start",{
@@ -100,6 +114,8 @@ Adventures.initAdventure = function(){
     });
 };
 
+
+//function in case server connection error
 Adventures.handleServerError = function (errorThrown) {
     Adventures.debugPrint("Server Error: " + errorThrown);
     var actualError = "";
@@ -110,11 +126,13 @@ Adventures.handleServerError = function (errorThrown) {
 
 };
 
+//function to print when in debug mode
 Adventures.debugPrint = function (msg) {
     if (Adventures.debugMode) {
         console.log("Adventures DEBUG: " + msg)
     }
 };
+
 
 Adventures.start();
 
