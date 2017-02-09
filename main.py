@@ -1,6 +1,9 @@
 from bottle import route, run, template, static_file, request
 import random
-import json
+import json, pymysql
+
+
+#add database connection here
 
 
 @route("/", method="GET")
@@ -73,4 +76,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+def playerUpdate():
+    try:
+        with connection.cursor() as cursor:
 
