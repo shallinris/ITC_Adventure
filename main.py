@@ -2,6 +2,11 @@ from bottle import route, run, template, static_file, request
 import random
 import json
 import pymysql
+import json, pymysql
+
+
+#add database connection here
+
 
 
 # ================ DATABASE INTERFACE  ======================
@@ -135,4 +140,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
 
