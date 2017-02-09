@@ -17,7 +17,7 @@ import json, pymysql
 connection = pymysql.connect(   host= 'localhost',
                                 port= 3306,
                                 user= 'root',
-                                password= '',
+                                password= 'talmap',
                                 db= 'adventure',
                                 charset='utf8',
                                 cursorclass=pymysql.cursors.DictCursor)
@@ -47,7 +47,7 @@ def add_user (userName):
 
 
 
-
+# print(add_user('Tomer Marx')
 
 
 # add user
