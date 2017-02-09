@@ -1,7 +1,69 @@
 from bottle import route, run, template, static_file, request
 import random
 import json
+import pymysql
 
+
+# ================ DATABASE INTERFACE  ======================
+
+
+# defining database connection
+
+connection = pymysql.connect(   host= 'localhost',
+                                port= 3306,
+                                user= 'root',
+                                password= '',
+                                db= 'adventure',
+                                charset='utf8',
+                                cursorclass=pymysql.cursors.DictCursor)
+
+
+# function
+def get_actors ():
+    with connection.cursor() as cursor:
+            sql= "SELECT * FROM actors"
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            return json.dumps(result)
+
+
+
+# check if user exists
+
+def add_user (userName):
+
+    # check if user exists
+    with connection.cursor() as cursor:
+            sql= "SELECT * FROM users WHERE user_name = '{0}'".format(userName)
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            
+            return json.dumps(result)
+
+
+
+
+
+
+# add user
+
+# check if active game for specific user
+
+# update life and step
+
+# get new story
+
+# if game over or complete change game status to complete
+
+
+
+
+
+
+
+
+
+# ======================= SERVER ===============================
 
 @route("/", method="GET")
 def index():
