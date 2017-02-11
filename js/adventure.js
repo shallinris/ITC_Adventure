@@ -3,7 +3,7 @@ var Adventures = {};
 Adventures.currentAdventure = 0; //todo keep track from db
 //currentStep is used for the step we're currently on (id). This should be determined at every crossroad, depending on what the user chose
 Adventures.currentStep = 0;//todo keep track from db
-Adventures.currentUser = 0;//todo keep track from db
+Adventures.currentUser = 1;//todo keep track from db
 
 
 //TODO: remove for production
@@ -97,6 +97,7 @@ Adventures.checkName = function(){
 //get new adventure and initiate
 Adventures.initAdventure = function(){
 
+
     $.ajax("/start",{
         type: "POST",
         data: {"user":
@@ -106,8 +107,8 @@ Adventures.initAdventure = function(){
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
-            console.log(data);
             Adventures.write(data);
+            Adventures.currentUser = data['user'];
             $(".adventure").show();
             $(".welcome-screen").hide();
         }
