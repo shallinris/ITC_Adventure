@@ -72,7 +72,7 @@ Adventures.write = function (message) {
     Adventures.setImage(message["image"]);
 };
 
-
+//functions to initiate frontend
 Adventures.start = function(){
     $(document).ready(function () {
 
@@ -106,11 +106,8 @@ Adventures.checkName = function(){
     }
 };
 
-
-
 //get new adventure and initiate
 Adventures.initAdventure = function(){
-
 
     $.ajax("/start",{
         type: "POST",
@@ -131,7 +128,6 @@ Adventures.initAdventure = function(){
     });
 };
 
-
 //function in case server connection error
 Adventures.handleServerError = function (errorThrown) {
     Adventures.debugPrint("Server Error: " + errorThrown);
@@ -149,7 +145,6 @@ Adventures.debugPrint = function (msg) {
         console.log("Adventures DEBUG: " + msg)
     }
 };
-
 
 Adventures.start();
 

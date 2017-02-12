@@ -41,16 +41,17 @@ INSERT INTO `users` VALUES
 CREATE TABLE `images` (
   `image_name` varchar(500) default NULL,
   `story_id` int(11),
+  `adventure_id` int(11),
   PRIMARY KEY  (`story_id`)
   );
 
 
 INSERT INTO `images` VALUES
-('inbed.jpg', 1),
-('clock.jpg', 2),
-('stairs.jpg', 3),
-('coffee_and_computer.jpeg', 4),
-('victory.jpg', 0);
+('inbed.jpg', 1, 1),
+('clock.jpg', 2, 1),
+('stairs.jpg', 3, 1),
+('coffee_and_computer.jpeg', 4, 1),
+('victory.jpg', 0, 0);
 
 --
 -- Table structure for table `story`
