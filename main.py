@@ -4,16 +4,9 @@ import json
 import pymysql
 import json, pymysql
 
-
-#add database connection here
-
-
-
 # ================ DATABASE INTERFACE  ======================
 
-
 # defining database connection
-
 connection = pymysql.connect(host='localhost',
                              port=3306,
                              user='root',
@@ -21,7 +14,6 @@ connection = pymysql.connect(host='localhost',
                              db='adventure',
                              charset='utf8',
                              cursorclass=pymysql.cursors.DictCursor)
-
 
 # check if user exists
 def check_user(userName):
@@ -125,7 +117,6 @@ def new_story(adventureID, storyID):
         result = cursor.fetchall()
         return result
 
-
 # get the amount of stories in an adventure
 def max_story(adventureID):
     with connection.cursor() as cursor:
@@ -133,7 +124,6 @@ def max_story(adventureID):
         cursor.execute(sql)
         result = cursor.fetchall()
         return result
-
 
 # funtion to get story data
 def get_story_data(adventure_id, story_id, question_type):
@@ -143,8 +133,6 @@ def get_story_data(adventure_id, story_id, question_type):
         result = cursor.fetchall()
         return result
 
-
-
 #funtion to update current state of game (health, game complete, coins, stage in game)
 def update_database(game_id, health, wealth, complete_status):
     with connection.cursor() as cursor:
@@ -152,9 +140,24 @@ def update_database(game_id, health, wealth, complete_status):
         cursor.execute(sql)
         connection.commit()
 
+# funtion to update current state of game (story id)
+def update_story_id(game_id, story_id):
+    with connection.cursor() as cursor:
+        sql = 'UPDATE games SET current_story_id = {0} WHERE game_id = {1};'.format(story_id, game_id)
+        cursor.execute(sql)
+        connection.commit()
 
+# get new image for story
+def get_story_image(adventure_id, story_id):
+    with connection.cursor() as cursor:
+        sql = 'SELECT * FROM images WHERE adventure_id = {0} AND story_id = {1};'.format(adventure_id, story_id)
+        cursor.execute(sql)
+        try:
+            result = (cursor.fetchall())[0]
+        except:
+            result = {"image_name" : " "}
 
-
+        return result
 
 
 # ======================= GAME LOGIC ===============================
@@ -171,10 +174,12 @@ def check_answer(adventure_id, story_id, answer, user_id):
     game_id = game_data["game_id"]
 
 
-    print("current player status " + str(str(user_wealth) + " " + str(user_health) + " " + str(game_status)))
+    print("current player status, wealth: {0}, health: {1}, game Status: {2}".format(user_wealth, user_health,game_status))
 
 
     # get information regarding specific story (current answer, damage, coins)
+
+    print("Test for sql query, adventure id: {0}, story_id: {1}, user answer: {2}".format(adventure_id,story_id,answer))
     story_data = (get_story_data(adventure_id,story_id,answer))[0]
 
     story_life_damage = story_data["life_unit"]
@@ -187,7 +192,7 @@ def check_answer(adventure_id, story_id, answer, user_id):
     user_health = user_health - story_life_damage
     user_wealth = user_wealth - story_wealth_damage
 
-    print("new player status " + str(str(user_wealth) + " " + str(user_health) + " " + str(game_status)))
+    print("Updated player status, wealth: {0}, health: {1}, game Status: {2}".format(user_wealth, user_health, game_status))
 
     # check if user is dead
     database_game_status = 0
@@ -204,14 +209,8 @@ def check_answer(adventure_id, story_id, answer, user_id):
     update_database(game_id,user_health,user_wealth,database_game_status)
 
 
-    # update heath and check if dead or not
-
-        # update database
-
+    # if game_status is -1, user died, if 0 game still contunues
     return game_status
-
-
-
 
 
 
@@ -221,7 +220,6 @@ def check_answer(adventure_id, story_id, answer, user_id):
 def index():
     return template("adventure.html")
 
-
 @route("/start", method="POST")
 def start():
     username = request.POST.get("user")
@@ -229,6 +227,9 @@ def start():
 
     user_id = 0
     current_story_id = 0
+    image=""
+
+
 
     # check if user exists
     if(not check_user(username)):
@@ -244,10 +245,12 @@ def start():
         user_id = get_user_id(username)
 
         if(not get_active_game_by_id(user_id)):
+
             current_story_id = 1
             create_game(user_id, current_adv_id)
         else:
             # upload uncompleted game
+            print("active game found")
             game_info = (get_active_game_by_id(user_id))[0]
             current_story_id = game_info["current_story_id"]
             current_adv_id = game_info["adventure_id"]
@@ -271,15 +274,17 @@ def start():
         ]
 
 
+    image = str((get_story_image(current_adv_id,current_story_id))["image_name"])
+
+
     #todo add the next step based on db
     return json.dumps({"user": user_id,
                        "adventure": current_adv_id,
                        "current": current_story_id,
                        "text": new_story_object[0]["content"] ,
-                       "image": "troll.png",
+                       "image": image,
                        "options": next_steps_results
                        })
-
 
 @route("/story", method="POST")
 def story():
@@ -291,12 +296,14 @@ def story():
     current_story_answer = int(float(request.POST.get("current_story_answer")))
 
 
-    print("user answer: " + str(current_story_answer))
+    print("user answer from frontend: " + str(current_story_answer))
 
     # check user answer and update life and coins
     game_complete = check_answer(current_adv_id, current_story_id, current_story_answer, user_id)
 
-    print("Game status after check answer: " + str(current_story_answer))
+
+
+    print("Game status after check answer: " + str(game_complete))
 
 
     # For testing purposes
@@ -329,6 +336,12 @@ def story():
             # get new story from database
             new_story_object = (new_story(current_adv_id,next_story))
 
+            # update database with story number
+            game_id = (get_active_game_by_id(user_id))[0]["game_id"]
+            update_story_id(game_id, next_story)
+
+
+
             next_steps_results = [
                 {"id": 1, "option_text": new_story_object[1]["content"]},
                 {"id": 2, "option_text": new_story_object[2]["content"]},
@@ -353,29 +366,30 @@ def story():
 
     random.shuffle(next_steps_results) #todo change - used only for demonstration purpouses
 
+    image = (get_story_image(current_adv_id, next_story))["image_name"]
+
+
     #todo add the next step based on db
     return json.dumps({"user": user_id,
                        "adventure": current_adv_id,
                        "text": story_question,
-                       "image": "choice.jpg",
+                       "image": image,
                        "options": next_steps_results,
                        "story_id": next_story,
                        "complete": game_complete
                        })
 
-
-
-@route('/js/<filename:re:.*\.js$>', method='GET')
+@route("/js/<filename:re:.*\.js>")
 def javascripts(filename):
-    return static_file(filename, root='js')
-
+    response = static_file(filename, root="js")
+    response.set_header("Cache-Control", "public, max-age=2")
+    return response
 
 @route('/css/<filename:re:.*\.css>', method='GET')
 def stylesheets(filename):
     return static_file(filename, root='css')
 
-
-@route('/images/<filename:re:.*\.(jpg|png|gif|ico)>', method='GET')
+@route('/images/<filename:re:.*\.(jpg|jpeg|png|gif|ico)>', method='GET')
 def images(filename):
     return static_file(filename, root='images')
 
