@@ -2,8 +2,9 @@ var Adventures = {};
 //currentAdventure is used for the adventure we're currently on (id). This should be determined at the beginning of the program
 Adventures.currentAdventure = 0; //todo keep track from db
 //currentStep is used for the step we're currently on (id). This should be determined at every crossroad, depending on what the user chose
-Adventures.currentStep = 0;//todo keep track from db
+Adventures.currentStory = 0;//todo keep track from db
 Adventures.currentUser = 1;//todo keep track from db
+Adventures.current_story_answer = 0;
 
 
 //TODO: remove for production
@@ -28,19 +29,26 @@ Adventures.bindErrorHandlers = function () {
 
 //The core function of the app, sends the user's choice and then parses the results to the server and handling the response
 Adventures.chooseOption = function(){
-    Adventures.currentStep = $(this).val();
+    Adventures.current_story_answer = $(this).val();
 
     $.ajax("/story",{
         type: "POST",
         data: {"user": Adventures.currentUser,
             "adventure": Adventures.currentAdventure,
-            "next": Adventures.currentStep},
+            "current_story": Adventures.currentStory,
+            "current_story_answer": Adventures.current_story_answer},
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
             console.log(data);
+            Adventures.currentStory = data["story_id"];
             $(".greeting-text").hide();
-            Adventures.write(data);
+
+            if(data["complete"] == 0){
+                Adventures.write(data)}
+            else {
+                alert("Game Over")
+            };
         }
     });
 };
@@ -109,6 +117,8 @@ Adventures.initAdventure = function(){
         success: function (data) {
             Adventures.write(data);
             Adventures.currentUser = data['user'];
+            Adventures.currentAdventure = data['adventure'];
+            Adventures.currentStory = data["current"];
             $(".adventure").show();
             $(".welcome-screen").hide();
         }
