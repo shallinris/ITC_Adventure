@@ -1,9 +1,9 @@
 var Adventures = {};
 //currentAdventure is used for the adventure we're currently on (id). This should be determined at the beginning of the program
-Adventures.currentAdventure = 0; //todo keep track from db
+Adventures.currentAdventure = 0;
 //currentStep is used for the step we're currently on (id). This should be determined at every crossroad, depending on what the user chose
-Adventures.currentStory = 0;//todo keep track from db
-Adventures.currentUser = 1;//todo keep track from db
+Adventures.currentStory = 0;
+Adventures.currentUser = 1;
 Adventures.current_story_answer = 0;
 
 
@@ -46,8 +46,14 @@ Adventures.chooseOption = function(){
 
             if(data["complete"] == 0){
                 Adventures.write(data)}
+            else if(data["complete"] == 1) {
+                alert("You won")
+            }
+            else if(data["complete"] == -1) {
+                alert("You're dead and/or broke")
+            }
             else {
-                alert("Game Over")
+                alert("Error")
             };
         }
     });
