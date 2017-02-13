@@ -1,9 +1,10 @@
 var Adventures = {};
 //currentAdventure is used for the adventure we're currently on (id). This should be determined at the beginning of the program
-Adventures.currentAdventure = 0; //todo keep track from db
+Adventures.currentAdventure = 0;
 //currentStep is used for the step we're currently on (id). This should be determined at every crossroad, depending on what the user chose
-Adventures.currentStep = 0;//todo keep track from db
-Adventures.currentUser = 1;//todo keep track from db
+Adventures.currentStory = 0;
+Adventures.currentUser = 1;
+Adventures.current_story_answer = 0;
 
 
 //TODO: remove for production
@@ -28,19 +29,32 @@ Adventures.bindErrorHandlers = function () {
 
 //The core function of the app, sends the user's choice and then parses the results to the server and handling the response
 Adventures.chooseOption = function(){
-    Adventures.currentStep = $(this).val();
+    Adventures.current_story_answer = $(this).val();
 
     $.ajax("/story",{
         type: "POST",
         data: {"user": Adventures.currentUser,
             "adventure": Adventures.currentAdventure,
-            "next": Adventures.currentStep},
+            "current_story": Adventures.currentStory,
+            "current_story_answer": Adventures.current_story_answer},
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
             console.log(data);
+            Adventures.currentStory = data["story_id"];
             $(".greeting-text").hide();
-            Adventures.write(data);
+
+            if(data["complete"] == 0){
+                Adventures.write(data)}
+            else if(data["complete"] == 1) {
+                alert("You won")
+            }
+            else if(data["complete"] == -1) {
+                alert("You're dead and/or broke")
+            }
+            else {
+                alert("Error")
+            };
         }
     });
 };
@@ -58,7 +72,7 @@ Adventures.write = function (message) {
     Adventures.setImage(message["image"]);
 };
 
-
+//functions to initiate frontend
 Adventures.start = function(){
     $(document).ready(function () {
 
@@ -92,11 +106,8 @@ Adventures.checkName = function(){
     }
 };
 
-
-
 //get new adventure and initiate
 Adventures.initAdventure = function(){
-
 
     $.ajax("/start",{
         type: "POST",
@@ -109,12 +120,13 @@ Adventures.initAdventure = function(){
         success: function (data) {
             Adventures.write(data);
             Adventures.currentUser = data['user'];
+            Adventures.currentAdventure = data['adventure'];
+            Adventures.currentStory = data["current"];
             $(".adventure").show();
             $(".welcome-screen").hide();
         }
     });
 };
-
 
 //function in case server connection error
 Adventures.handleServerError = function (errorThrown) {
@@ -134,6 +146,4 @@ Adventures.debugPrint = function (msg) {
     }
 };
 
-
 Adventures.start();
-
