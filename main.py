@@ -1,17 +1,18 @@
 from bottle import route, run, template, static_file, request
 import random
-import json
-import pymysql
 import json, pymysql
+import os
+from os import environ as env
+from sys import argv
 
 # ================ DATABASE INTERFACE  ======================
 
 # defining database connection
-connection = pymysql.connect(host='localhost',
+connection = pymysql.connect(host='sql11.freemysqlhosting.net',
                              port=3306,
-                             user='root',
-                             password='talmap',
-                             db='adventure',
+                             user='sql11158744',
+                             password='c1svKiKCGI',
+                             db='sql11158744',
                              charset='utf8',
                              cursorclass=pymysql.cursors.DictCursor)
 
@@ -394,7 +395,11 @@ def images(filename):
     return static_file(filename, root='images')
 
 def main():
-    run(host='localhost', port=9000)
+    run(host='0.0.0.0', port=argv[1])
+
+# def main():
+#     run(host='localhost', port=9000)
+
 
 if __name__ == '__main__':
     main()
