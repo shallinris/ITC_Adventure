@@ -3,48 +3,18 @@ DROP DATABASE IF EXISTS adventure;
 CREATE DATABASE adventure;
 USE adventure;
 
---
--- Table structure for table `users`
---
-
--- DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`(
   `user_id` int(11) auto_increment,
   `user_name` varchar(200) default NULL,
    PRIMARY KEY  (`user_id`)
-); -- ENGINE=MyISAM DEFAULT CHARSET=utf8;
+);
 
---
--- Dumping data for table `users`
---
-
--- /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES
-(0,'Tomer Marx'),
-(0,'Shallin Ris');
--- /*!40000 ALTER TABLE `users` ENABLE KEYS */;
-
---
--- Table structure for table `games`
---
-
-
---
--- Dumping data for table `games`
---
-
--- LOCK TABLES `games` WRITE;
--- /*!40000 ALTER TABLE `games` DISABLE KEYS */;
-
--- /*!40000 ALTER TABLE `games` ENABLE KEYS */;
--- UNLOCK TABLES;
 CREATE TABLE `images` (
   `image_name` varchar(500) default NULL,
   `story_id` int(11),
   `adventure_id` int(11),
   PRIMARY KEY  (`story_id`)
   );
-
 
 INSERT INTO `images` VALUES
 ('inbed.jpg', 1, 1),
@@ -57,11 +27,6 @@ INSERT INTO `images` VALUES
 ('work.jpeg', 8, 2),
 ('victory.jpg', 0, 0);
 
---
--- Table structure for table `story`
---
-
--- DROP TABLE IF EXISTS `story`;
 CREATE TABLE `story` (
   `id` int(11),
   `adventure_id` int(11) default NULL,
@@ -74,16 +39,6 @@ CREATE TABLE `story` (
   FOREIGN KEY (story_id) REFERENCES images(story_id)
   );
 
---  KEY `idx_actor_id` (`actor_id`),
---  KEY `idx_movie_id` (`movie_id`)
- -- ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `story`
---
-
--- LOCK TABLES `story` WRITE;
--- /*!40000 ALTER TABLE `story` DISABLE KEYS */;
 INSERT INTO `story` VALUES
 (1, 1, 1, 0, 'You wake up late. You:', 0, 0),
 (2, 1, 1, 1, 'get ready in a hurry, put on your running shoes and sprint to campus', 30, 2),
@@ -125,34 +80,19 @@ INSERT INTO `story` VALUES
 (38, 2, 8, 2, 'You dont leave much extra time to get there and you show up a little late', 20, 4),
 (39, 2, 8, 3, 'You ask if you can work from home because youre erally nervous', 50, 8),
 (40, 2, 8, 4, 'You take everyone in your new office out to breakfast', 30, 10)
-
-
 ;
--- /*!40000 ALTER TABLE `story` ENABLE KEYS */;
--- UNLOCK TABLES;
 
--- Table structure for table `adventure`
-
--- DROP TABLE IF EXISTS `adventure`;
 CREATE TABLE `adventure` (
   `adventure_id` int(11),
   `adventure_name` varchar(250) default NULL,
   PRIMARY KEY  (`adventure_id`)
---  KEY `idx_actor_id` (`actor_id`),
---  KEY `idx_movie_id` (`movie_id`)
-); -- ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
--- Dumping data for table `adventure`
+);
 
--- LOCK TABLES `adventure` WRITE;
--- /*!40000 ALTER TABLE `adventure` DISABLE KEYS */;
 INSERT INTO `adventure` VALUES
 (1,'Surviving ITC'),
 (2, 'Getting a Job After ITC');
--- /*!40000 ALTER TABLE `adventure` ENABLE KEYS */;
--- UNLOCK TABLES;
 
--- DROP TABLE IF EXISTS `games`;
 CREATE TABLE `games` (
   `game_id` int(11) auto_increment,
   `user_id` int(11),
@@ -164,9 +104,5 @@ CREATE TABLE `games` (
   PRIMARY KEY (`game_id`),
   FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (adventure_id) REFERENCES adventure(adventure_id)
---  should this be the primary key??
-); -- ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `games` VALUES
-(0, 1, 1, 100, 10, 4, 1),
-(0, 2, 1, 55, 4, 5, 1);
+);
